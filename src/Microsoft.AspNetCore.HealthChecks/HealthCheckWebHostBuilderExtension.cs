@@ -12,9 +12,15 @@ namespace Microsoft.AspNetCore.Hosting
         public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(10);
 
         public static IWebHostBuilder UseHealthChecks(this IWebHostBuilder builder, int port)
-            => UseHealthChecks(builder, port, DefaultTimeout);
+            => UseHealthChecks<HealthCheckMiddleware>(builder, port, DefaultTimeout);
 
         public static IWebHostBuilder UseHealthChecks(this IWebHostBuilder builder, int port, TimeSpan timeout)
+             => UseHealthChecks<HealthCheckMiddleware>(builder, port, timeout);
+
+        public static IWebHostBuilder UseHealthChecks<TMiddleware>(this IWebHostBuilder builder, int port)
+             => UseHealthChecks<TMiddleware>(builder, port, DefaultTimeout);
+
+        public static IWebHostBuilder UseHealthChecks<TMiddleware>(this IWebHostBuilder builder, int port, TimeSpan timeout)
         {
             Guard.ArgumentValid(port > 0 && port < 65536, nameof(port), "Port must be a value between 1 and 65535.");
             Guard.ArgumentValid(timeout > TimeSpan.Zero, nameof(timeout), "Health check timeout must be a positive time span.");
@@ -24,15 +30,21 @@ namespace Microsoft.AspNetCore.Hosting
                 var existingUrl = builder.GetSetting(WebHostDefaults.ServerUrlsKey);
                 builder.UseSetting(WebHostDefaults.ServerUrlsKey, $"{existingUrl};http://localhost:{port}");
 
-                services.AddSingleton<IStartupFilter>(new HealthCheckStartupFilter(port, timeout));
+                services.AddSingleton<IStartupFilter>(new HealthCheckStartupFilter<TMiddleware>(port, timeout));
             });
             return builder;
         }
 
         public static IWebHostBuilder UseHealthChecks(this IWebHostBuilder builder, string path)
-            => UseHealthChecks(builder, path, DefaultTimeout);
+            => UseHealthChecks<HealthCheckMiddleware>(builder, path, DefaultTimeout);
 
         public static IWebHostBuilder UseHealthChecks(this IWebHostBuilder builder, string path, TimeSpan timeout)
+            => UseHealthChecks<HealthCheckMiddleware>(builder, path, timeout);
+        
+        public static IWebHostBuilder UseHealthChecks<TMiddleware>(this IWebHostBuilder builder, string path)
+            => UseHealthChecks<TMiddleware>(builder, path, DefaultTimeout);
+
+        public static IWebHostBuilder UseHealthChecks<TMiddleware>(this IWebHostBuilder builder, string path, TimeSpan timeout)
         {
             Guard.ArgumentNotNull(nameof(path), path);
             // REVIEW: Is there a better URL path validator somewhere?
@@ -40,7 +52,7 @@ namespace Microsoft.AspNetCore.Hosting
             Guard.ArgumentValid(path.StartsWith("/"), nameof(path), "Path should start with '/'.");
             Guard.ArgumentValid(timeout > TimeSpan.Zero, nameof(timeout), "Health check timeout must be a positive time span.");
 
-            builder.ConfigureServices(services => services.AddSingleton<IStartupFilter>(new HealthCheckStartupFilter(path, timeout)));
+            builder.ConfigureServices(services => services.AddSingleton<IStartupFilter>(new HealthCheckStartupFilter<TMiddleware>(path, timeout)));
             return builder;
         }
     }

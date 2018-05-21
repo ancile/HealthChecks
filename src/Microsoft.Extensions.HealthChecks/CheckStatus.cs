@@ -8,6 +8,7 @@ namespace Microsoft.Extensions.HealthChecks
         Unknown,
         Unhealthy,
         Healthy,
-        Warning
+        Warning,
+        Alive
     }
 }

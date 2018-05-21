@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.HealthChecks
             _timeout = timeout;
         }
 
-        public async Task Invoke(HttpContext context)
+        public virtual async Task Invoke(HttpContext context)
         {
             if (IsHealthCheckRequest(context))
             {
@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.HealthChecks
             }
         }
 
-        private bool IsHealthCheckRequest(HttpContext context)
+        protected bool IsHealthCheckRequest(HttpContext context)
         {
             if (_port.HasValue)
             {

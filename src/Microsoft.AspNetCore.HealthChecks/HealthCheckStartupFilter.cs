@@ -7,39 +7,37 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Microsoft.AspNetCore.HealthChecks
 {
-    public class HealthCheckStartupFilter : IStartupFilter
+    public class HealthCheckStartupFilter : HealthCheckStartupFilter<HealthCheckMiddleware>
     {
-        private string _path;
-        private int? _port;
-        private TimeSpan _timeout;
+        //private string _path;
+        //private int? _port;
+        //private TimeSpan _timeout;
 
         public HealthCheckStartupFilter(int port, TimeSpan timeout)
+            :base(port, timeout)
         {
-            _port = port;
-            _timeout = timeout;
         }
 
         public HealthCheckStartupFilter(string path, TimeSpan timeout)
+            : base(path, timeout)
         {
-            _path = path;
-            _timeout = timeout;
         }
 
-        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
-        {
-            return app =>
-            {
-                if (_port.HasValue)
-                {
-                    app.UseMiddleware<HealthCheckMiddleware>(_port, _timeout);
-                }
-                else
-                {
-                    app.UseMiddleware<HealthCheckMiddleware>(_path, _timeout);
-                }
+        //public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+        //{
+        //    return app =>
+        //    {
+        //        if (_port.HasValue)
+        //        {
+        //            app.UseMiddleware<HealthCheckMiddleware>(_port, _timeout);
+        //        }
+        //        else
+        //        {
+        //            app.UseMiddleware<HealthCheckMiddleware>(_path, _timeout);
+        //        }
 
-                next(app);
-            };
-        }
+        //        next(app);
+        //    };
+        //}
     }
 }
