@@ -13,11 +13,11 @@ namespace Microsoft.AspNetCore.HealthChecks
 {
     public class HealthCheckMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly string _path;
-        private readonly int? _port;
-        private readonly IHealthCheckService _service;
-        private readonly TimeSpan _timeout;
+        protected readonly RequestDelegate _next;
+        protected readonly string _path;
+        protected readonly int? _port;
+        protected readonly IHealthCheckService _service;
+        protected readonly TimeSpan _timeout;
 
         public HealthCheckMiddleware(RequestDelegate next, IHealthCheckService service, int port, TimeSpan timeout)
         {
